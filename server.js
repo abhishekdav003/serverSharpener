@@ -1,17 +1,47 @@
 const express = require("express")
 
 const app = express()
+app.use(express.json())
+const port = 3000
 
-app.use("/welcome", (req, res, next) => {
-  req.user = "Guest"
-  next()
+const users = [
+  {
+    "id": 1,
+    "name":"abhishek"
+  },
+  {
+    "id": 2,
+    "name":"aman"
+  }
+]
+
+app.get("/", (req,res) => {
+  res.send("server is running")
+})
+
+app.get("/users/:id", (req, res) => {
+  const userId = parseInt(req.params.id)
+  const user = users.find(u => u.id === userId)
+  if (!user) {
+    res.status(404).json({message:"user not found"})
+  }
+
+  res.json(user)
 
 })
 
-app.get("/welcome", (req, res) => {
-  res.send(`<h1>Welcome, ${req.user}</h1>`)
+app.post("/users", (req, res) => {
+  const {name} = req.body
+  const newUser = { id: users.length + 1, name }
+  users.push(newUser)
+  res.status(201).json(newUser)
+
 })
 
-app.listen(3000, () => {
-  console.log("Server is running on 3000")
+app.get("/users", (req, res) => {
+  res.json(users)
+})
+
+app.listen(port, () => {
+  console.log("Server is running on port:" ,  port)
 })
